@@ -1,3 +1,8 @@
+/*
+ * @Author: Yang
+ * @Date: 2023-04-10 18:22:12
+ * @Description: 请填写简介
+ */
 package system
 
 import (
@@ -13,6 +18,7 @@ func (s *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) (R gin.IRoutes) {
 	{
 		baseRouter.POST("login", baseApi.Login)
 		baseRouter.POST("captcha", baseApi.Captcha)
+		baseRouter.POST("wxlogin", baseApi.WXLogin)
 	}
 	return baseRouter
 }

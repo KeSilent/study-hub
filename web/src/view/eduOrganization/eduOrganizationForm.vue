@@ -9,7 +9,7 @@
           <el-input v-model="formData.brief" :clearable="true" placeholder="请输入" />
         </el-form-item>
         <el-form-item label="组织详情（HTML字符串）:" prop="details">
-          <el-input v-model="formData.details" :clearable="true" placeholder="请输入" />
+          <el-input type="textarea" v-model="formData.details" :clearable="true" placeholder="请输入" />
         </el-form-item>
         <el-form-item label="联系方式:" prop="contactInfo">
           <el-input v-model="formData.contactInfo" :clearable="true" placeholder="请输入" />

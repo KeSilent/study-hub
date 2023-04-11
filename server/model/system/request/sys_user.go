@@ -1,3 +1,8 @@
+/*
+ * @Author: Yang
+ * @Date: 2023-04-10 18:22:12
+ * @Description: 用户
+ */
 package request
 
 import (
@@ -53,4 +58,12 @@ type ChangeUserInfo struct {
 	SideMode     string                `json:"sideMode"  gorm:"comment:用户侧边主题"`                                                      // 用户侧边主题
 	Enable       int                   `json:"enable" gorm:"comment:冻结用户"`                                                           //冻结用户
 	Authorities  []system.SysAuthority `json:"-" gorm:"many2many:sys_user_authority;"`
+}
+
+/**
+ * @description: 微信请求
+ * @return {*}
+ */
+type WXLoginReq struct {
+	Code string `json:"code"`
 }

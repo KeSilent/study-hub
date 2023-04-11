@@ -19,6 +19,10 @@ ALTER TABLE `sys_users`
 ADD
     COLUMN `wx_openid` VARCHAR(255) DEFAULT NULL COMMENT '微信ID';
 
+ALTER TABLE `sys_users`
+ADD
+    COLUMN `wx_session_key` VARCHAR(255) DEFAULT NULL COMMENT '微信session_key';
+
 CREATE TABLE
     `edu_course` (
         `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '课程ID',

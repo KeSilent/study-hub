@@ -460,3 +460,20 @@ func (b *BaseApi) ResetPassword(c *gin.Context) {
 	}
 	response.OkWithMessage("重置成功", c)
 }
+
+/**
+ * @description: 微信登陆
+ * @param {*gin.Context} c
+ * @return {*}
+ */
+func (b *BaseApi) WXLogin(c *gin.Context) {
+	var l systemReq.WXLoginReq
+	err := c.ShouldBindJSON(&l)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	user, _ := userExtendService.WXLogin(l)
+
+	b.TokenNext(c, *user)
+}

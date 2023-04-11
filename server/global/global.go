@@ -1,3 +1,8 @@
+/*
+ * @Author: Yang
+ * @Date: 2023-04-10 18:22:12
+ * @Description: 全局
+ */
 package global
 
 import (
@@ -30,6 +35,9 @@ var (
 
 	BlackCache local_cache.Cache
 	lock       sync.RWMutex
+
+	WXAppId  string = "wxe4bfe66b935c32c4"               //微信的appId
+	WXSecret string = "14b4858937710fa9c022c9fe3c4ce87d" //微信的Secret
 )
 
 // GetGlobalDBByDBName 通过名称获取db list中的db

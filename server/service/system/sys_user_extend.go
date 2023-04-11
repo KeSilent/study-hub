@@ -1,0 +1,108 @@
+/*
+ * @Author: Yang
+ * @Date: 2023-03-19 22:23:28
+ * @Description: 系统操作类扩展
+ */
+package system
+
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"net/http"
+	"strconv"
+
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/system/response"
+	"github.com/flipped-aurora/gin-vue-admin/server/plugin/wx"
+	"gorm.io/gorm"
+)
+
+type UserExtendService struct {
+	UserService
+}
+
+/**
+ * @description: 微信登陆
+ * @param {system.SysUser} u
+ * @return {*}
+ */
+func (userService *UserService) WXLogin(u systemReq.WXLoginReq) (userInter *system.SysUser, err error) {
+	if nil == global.GVA_DB {
+		return nil, fmt.Errorf("db not init")
+	}
+
+	wxKey, err := wx.GetWXSession(u.Code)
+	if err != nil {
+		return userInter, err
+	}
+
+	userInter, err = SelectUser(wxKey.OpenId, wxKey.SessionKey)
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		//没有注册
+		var registerUser system.SysUser
+		registerUser.NickName = gofakeit.Username()
+		registerUser.Password = "11234567890"
+		registerUser.Username = gofakeit.Username()
+		registerUser.WXOpenid = wxKey.OpenId
+		registerUser.WXSessionKey = wxKey.SessionKey
+		userService.Register(registerUser)
+	} else {
+		global.GVA_DB.Model(&userInter).Where("wx_openid = ?", wxKey.OpenId).Updates(system.SysUser{WXSessionKey: wxKey.SessionKey})
+	}
+	userInter, err = SelectUser(wxKey.OpenId, wxKey.SessionKey)
+
+	MenuServiceApp.UserAuthorityDefaultRouter(userInter)
+
+	return userInter, err
+}
+
+/**
+ * @Description: 查询用户
+ * @param {string} openId
+ * @param {string} sessionKey
+ * @return {*}
+ */
+func SelectUser(openId string, _ string) (userInter *system.SysUser, err error) {
+	var user system.SysUser
+	err = global.GVA_DB.Where("wx_openid = ?", openId).Preload("Authorities").Preload("Authority").First(&user).Error
+	return &user, err
+}
+
+/**
+ * @description: 获取微信OpenId
+ * @param {string} code
+ * @return {*}
+ */
+func GetWXSession(code string) (*response.WXLoginResp, error) {
+	url := "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code"
+
+	// 合成url, 这里的appId和secret是在微信公众平台上获取的
+	url = fmt.Sprintf(url, global.WXAppId, global.WXSecret, code)
+
+	// 创建http get请求
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// 解析http请求中body 数据到我们定义的结构体中
+	wxResp := response.WXLoginResp{}
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(&wxResp); err != nil {
+		return nil, err
+	}
+
+	// 判断微信接口返回的是否是一个异常情况
+	if wxResp.ErrCode != 0 {
+		errCodeStr := strconv.Itoa(wxResp.ErrCode)
+		return nil, fmt.Errorf("ErrCode:%s  ErrMsg:%s", errCodeStr, wxResp.ErrMsg)
+	}
+
+	return &wxResp, nil
+}

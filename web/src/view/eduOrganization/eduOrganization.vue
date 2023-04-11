@@ -41,7 +41,7 @@
         </el-table-column>
         <el-table-column align="left" label="组织名称" prop="name" width="120" />
         <el-table-column align="left" label="组织简介" prop="brief" width="120" />
-        <el-table-column align="left" label="组织详情（HTML字符串）" prop="details" width="120" />
+        <el-table-column align="left" label="组织详情" prop="details" width="120" />
         <el-table-column align="left" label="联系方式" prop="contactInfo" width="120" />
         <el-table-column align="left" label="地址" prop="address" width="120" />
         <el-table-column align="left" label="按钮组">
@@ -71,8 +71,8 @@
         <el-form-item label="组织简介:"  prop="brief" >
           <el-input v-model="formData.brief" :clearable="true"  placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="组织详情（HTML字符串）:"  prop="details" >
-          <el-input v-model="formData.details" :clearable="true"  placeholder="请输入" />
+        <el-form-item label="组织详情:"  prop="details" >
+          <el-input type="textarea" v-model="formData.details" :clearable="true"  placeholder="请输入" />
         </el-form-item>
         <el-form-item label="联系方式:"  prop="contactInfo" >
           <el-input v-model="formData.contactInfo" :clearable="true"  placeholder="请输入" />

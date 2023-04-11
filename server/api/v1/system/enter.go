@@ -1,3 +1,8 @@
+/*
+ * @Author: Yang
+ * @Date: 2023-04-10 18:22:12
+ * @Description: 请填写简介
+ */
 package system
 
 import "github.com/flipped-aurora/gin-vue-admin/server/service"
@@ -25,6 +30,7 @@ var (
 	jwtService              = service.ServiceGroupApp.SystemServiceGroup.JwtService
 	menuService             = service.ServiceGroupApp.SystemServiceGroup.MenuService
 	userService             = service.ServiceGroupApp.SystemServiceGroup.UserService
+	userExtendService       = service.ServiceGroupApp.SystemServiceGroup.UserService
 	initDBService           = service.ServiceGroupApp.SystemServiceGroup.InitDBService
 	casbinService           = service.ServiceGroupApp.SystemServiceGroup.CasbinService
 	autoCodeService         = service.ServiceGroupApp.SystemServiceGroup.AutoCodeService
