@@ -50,7 +50,6 @@ func (userService *UserService) WXLogin(u systemReq.WXLoginReq) (userInter *syst
 		registerUser.Username = gofakeit.Username()
 		registerUser.WXOpenid = wxKey.OpenId
 		registerUser.WXSessionKey = wxKey.SessionKey
-		userService.Register(registerUser)
 	} else {
 		global.GVA_DB.Model(&userInter).Where("wx_openid = ?", wxKey.OpenId).Updates(system.SysUser{WXSessionKey: wxKey.SessionKey})
 	}
@@ -69,7 +68,7 @@ func (userService *UserService) WXLogin(u systemReq.WXLoginReq) (userInter *syst
  */
 func SelectUser(openId string, _ string) (userInter *system.SysUser, err error) {
 	var user system.SysUser
-	err = global.GVA_DB.Where("wx_openid = ?", openId).Preload("Authorities").Preload("Authority").First(&user).Error
+	err = global.GVA_DB.Preload("EduOrganization").Where("wx_openid = ?", openId).Preload("Authorities").Preload("Authority").First(&user).Error
 	return &user, err
 }
 

@@ -19,7 +19,7 @@ type SysUser struct {
 	WXOpenid          string                           `json:"-"  gorm:"comment:微信Openid"`          // 用户登录密码
 	WXSessionKey      string                           `json:"-"  gorm:"comment:微信SessionKey"`
 	EduOrganizationID uint                             `json:"eduOrganizationID" gorm:"comment:组织ID"`
-	EduOrganization   edu_organization.EduOrganization `json:"eduOrganization" gorm:"foreignKey:EduOrganizationID;comment:用户昵称"`                     // 用户组织
+	EduOrganization   edu_organization.EduOrganization `json:"eduOrganization" gorm:"foreignKey:ID;references:EduOrganizationID;comment:用户昵称"`       // 用户组织
 	NickName          string                           `json:"nickName" gorm:"default:系统用户;comment:用户昵称"`                                            // 用户昵称
 	SideMode          string                           `json:"sideMode" gorm:"default:dark;comment:用户侧边主题"`                                          // 用户侧边主题
 	HeaderImg         string                           `json:"headerImg" gorm:"default:https://qmplusimg.henrongyi.top/gva_header.jpg;comment:用户头像"` // 用户头像

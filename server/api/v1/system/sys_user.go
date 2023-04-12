@@ -367,12 +367,13 @@ func (b *BaseApi) SetUserInfo(c *gin.Context) {
 		GVA_MODEL: global.GVA_MODEL{
 			ID: user.ID,
 		},
-		NickName:  user.NickName,
-		HeaderImg: user.HeaderImg,
-		Phone:     user.Phone,
-		Email:     user.Email,
-		SideMode:  user.SideMode,
-		Enable:    user.Enable,
+		NickName:          user.NickName,
+		HeaderImg:         user.HeaderImg,
+		Phone:             user.Phone,
+		Email:             user.Email,
+		SideMode:          user.SideMode,
+		Enable:            user.Enable,
+		EduOrganizationID: user.EduOrganizationID,
 	})
 	if err != nil {
 		global.GVA_LOG.Error("设置失败!", zap.Error(err))
