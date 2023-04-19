@@ -1,3 +1,8 @@
+/*
+ * @Author: Yang
+ * @Date: 2023-04-10 18:22:12
+ * @Description: 请填写简介
+ */
 package request
 
 // PageInfo Paging common input parameter structure
@@ -5,6 +10,14 @@ type PageInfo struct {
 	Page     int    `json:"page" form:"page"`         // 页码
 	PageSize int    `json:"pageSize" form:"pageSize"` // 每页大小
 	Keyword  string `json:"keyword" form:"keyword"`   //关键字
+}
+
+// 创建一个接受页码、每页大小、角色id和组织ID的结构
+type PageInfoByRoleIdAndOrgId struct {
+	Page     int `json:"page" form:"page"`
+	PageSize int `json:"pageSize" form:"pageSize"`
+	RoleId   int `json:"roleId" form:"roleId"`
+	OrgId    int `json:"orgId" form:"orgId"`
 }
 
 // GetById Find by id structure

@@ -478,3 +478,34 @@ func (b *BaseApi) WXLogin(c *gin.Context) {
 
 	b.TokenNext(c, *user)
 }
+
+/**
+ * @Description: 通过角色ID和组织ID获取用户列表
+ * @param {*gin.Context} c
+ * @return {*}
+ */
+func (b *BaseApi) GetUserListByRoleIdAndOrgId(c *gin.Context) {
+	var pageInfo request.PageInfoByRoleIdAndOrgId
+	err := c.ShouldBindJSON(&pageInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(pageInfo, utils.PageInfoVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	list, total, err := userService.GetUserListByRoleIdAndOrgId(pageInfo)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+		return
+	}
+	response.OkWithDetailed(response.PageResult{
+		List:     list,
+		Total:    total,
+		Page:     pageInfo.Page,
+		PageSize: pageInfo.PageSize,
+	}, "获取成功", c)
+}
