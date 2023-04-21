@@ -43,4 +43,6 @@ var (
 	dictionaryDetailService = service.ServiceGroupApp.SystemServiceGroup.DictionaryDetailService
 	authorityBtnService     = service.ServiceGroupApp.SystemServiceGroup.AuthorityBtnService
 	chatGptService          = service.ServiceGroupApp.SystemServiceGroup.ChatGptService
+
+	eduEnrollmentService = service.ServiceGroupApp.Edu_user_courseServiceGroup.EduEnrollmentService
 )

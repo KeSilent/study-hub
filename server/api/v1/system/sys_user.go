@@ -7,6 +7,7 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	systemRes "github.com/flipped-aurora/gin-vue-admin/server/model/system/response"
@@ -508,4 +509,40 @@ func (b *BaseApi) GetUserListByRoleIdAndOrgId(c *gin.Context) {
 		Page:     pageInfo.Page,
 		PageSize: pageInfo.PageSize,
 	}, "获取成功", c)
+}
+
+// RegisterStudent
+func (b *BaseApi) RegisterStudent(c *gin.Context) {
+	var r systemReq.Register
+	err := c.ShouldBindJSON(&r)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(r, utils.RegisterVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	var authorities []system.SysAuthority
+	for _, v := range r.AuthorityIds {
+		authorities = append(authorities, system.SysAuthority{
+			AuthorityId: v,
+		})
+	}
+	user := &system.SysUser{Username: r.Username, NickName: r.NickName, Password: r.Password, HeaderImg: r.HeaderImg, AuthorityId: r.AuthorityId, Authorities: authorities, Enable: r.Enable, Phone: r.Phone, Email: r.Email, EduOrganizationID: r.EduOrganizationID}
+
+	eduEnrollment := edu_user_course.EduEnrollment{}
+	eduEnrollment.CourseId = &r.Course
+	eduEnrollment.TotalSessions = &r.TotalSessions
+	eduEnrollment.RemainingSessions = &r.RemainingSessions
+
+	userReturn, err := userService.RegisterStudent(*user, &eduEnrollment)
+	if err != nil {
+		global.GVA_LOG.Error("注册失败!", zap.Error(err))
+		response.FailWithDetailed(systemRes.SysUserResponse{User: userReturn}, "注册失败", c)
+		return
+	}
+
+	response.OkWithDetailed(systemRes.SysUserResponse{User: userReturn}, "注册成功", c)
 }

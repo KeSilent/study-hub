@@ -7,6 +7,7 @@ import (
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	uuid "github.com/satori/go.uuid"
@@ -266,4 +267,30 @@ func (userService *UserService) FindUserByUuid(uuid string) (user *system.SysUse
 func (userService *UserService) ResetPassword(ID uint) (err error) {
 	err = global.GVA_DB.Model(&system.SysUser{}).Where("id = ?", ID).Update("password", utils.BcryptHash("123456")).Error
 	return err
+}
+
+func (userService *UserService) RegisterStudent(u system.SysUser, eduEnrollment *edu_user_course.EduEnrollment) (userInter system.SysUser, err error) {
+	var user system.SysUser
+	if !errors.Is(global.GVA_DB.Where("username = ?", u.Username).First(&user).Error, gorm.ErrRecordNotFound) { // 判断用户名是否注册
+		return userInter, errors.New("用户名已注册")
+	}
+	// 否则 附加uuid 密码hash加密 注册
+	u.Password = utils.BcryptHash(u.Password)
+	u.UUID = uuid.NewV4()
+	tx := global.GVA_DB.Begin()
+	if err := tx.Create(&u).Error; err != nil {
+		tx.Rollback()
+		return u, err
+	}
+
+	userId := int(u.GVA_MODEL.ID)
+	eduEnrollment.UserId = &userId
+
+	if err := tx.Create(eduEnrollment).Error; err != nil {
+		tx.Rollback()
+		return u, err
+	}
+	tx.Commit()
+
+	return u, err
 }
