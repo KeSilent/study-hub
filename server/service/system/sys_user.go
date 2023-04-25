@@ -102,9 +102,13 @@ func (userService *UserService) GetUserListByRoleIdAndOrgId(info request.PageInf
 	offset := info.PageSize * (info.Page - 1)
 	db := global.GVA_DB.Model(&system.SysUser{})
 
+	if info.UserName != "" {
+		db = db.Where("nick_name LIKE ?", "%"+info.UserName+"%")
+	}
+
 	if info.RoleId > 0 {
-		db = db.Joins("left join sys_user_roles on sys_user_roles.sys_user_id = sys_users.id").
-			Where("sys_user_roles.sys_role_id = ?", info.RoleId)
+		db = db.Joins("left join sys_user_authority on sys_user_authority.sys_user_id = sys_users.id").
+			Where("sys_user_authority.sys_authority_authority_id = ?", info.RoleId)
 	}
 	if info.OrgId > 0 {
 		db = db.Where("edu_organization_id = ?", info.OrgId)
@@ -115,7 +119,7 @@ func (userService *UserService) GetUserListByRoleIdAndOrgId(info request.PageInf
 	if err != nil {
 		return
 	}
-	err = db.Limit(limit).Offset(offset).Preload("Authorities").Preload("Authority").Find(&userList).Error
+	err = db.Limit(limit).Offset(offset).Preload("EduEnrollments.EduCourse").Preload("EduOrganization").Preload("Authorities").Preload("Authority").Find(&userList).Error
 	return userList, total, err
 }
 

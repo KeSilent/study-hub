@@ -14,10 +14,11 @@ type PageInfo struct {
 
 // 创建一个接受页码、每页大小、角色id和组织ID的结构
 type PageInfoByRoleIdAndOrgId struct {
-	Page     int `json:"page" form:"page"`
-	PageSize int `json:"pageSize" form:"pageSize"`
-	RoleId   int `json:"roleId" form:"roleId"`
-	OrgId    int `json:"orgId" form:"orgId"`
+	Page     int    `json:"page" form:"page"`
+	PageSize int    `json:"pageSize" form:"pageSize"`
+	RoleId   int    `json:"roleId" form:"roleId"`
+	OrgId    int    `json:"orgId" form:"orgId"`
+	UserName string `json:"userName" form:"userName"`
 }
 
 // GetById Find by id structure
