@@ -25,3 +25,19 @@ type EduEnrollment struct {
 func (EduEnrollment) TableName() string {
 	return "edu_enrollment"
 }
+
+// ConsumptionClassReq 消耗课时请求参数
+type ConsumptionClassResp struct {
+	UserId            int    `json:"userId"`            // 用户ID
+	CourseId          int    `json:"courseId"`          // 课程ID
+	SessionsToConsume int    `json:"sessionsToConsume"` // 消耗课时数
+	Reason            string `json:"reason"`            // 消耗原因
+}
+
+// AddSessionReq 增加课时请求参数
+type AddSessionResp struct {
+	UserId        int    `json:"userId"`        // 用户ID
+	CourseId      int    `json:"courseId"`      // 课程ID
+	SessionsToAdd int    `json:"sessionsToAdd"` // 增加课时数
+	Reason        string `json:"reason"`        // 消耗原因
+}
