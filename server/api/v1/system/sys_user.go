@@ -546,3 +546,19 @@ func (b *BaseApi) RegisterStudent(c *gin.Context) {
 
 	response.OkWithDetailed(systemRes.SysUserResponse{User: userReturn}, "注册成功", c)
 }
+
+/**
+ * @Description: 通过用户ID获取信息
+ * @param {*gin.Context} c
+ * @return {*}
+ */
+func (b *BaseApi) GetUserInfoById(c *gin.Context) {
+	userId := c.Query("userId")
+	ReqUser, err := userService.GetUserInfoById(userId)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+		return
+	}
+	response.OkWithDetailed(gin.H{"userInfo": ReqUser}, "获取成功", c)
+}

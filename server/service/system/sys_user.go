@@ -228,7 +228,7 @@ func (userService *UserService) SetSelfInfo(req system.SysUser) error {
 
 func (userService *UserService) GetUserInfo(uuid uuid.UUID) (user system.SysUser, err error) {
 	var reqUser system.SysUser
-	err = global.GVA_DB.Preload("Authorities").Preload("Authority").First(&reqUser, "uuid = ?", uuid).Error
+	err = global.GVA_DB.Preload("EduEnrollments.EduCourse").Preload("EduOrganization").Preload("Authorities").Preload("Authority").First(&reqUser, "uuid = ?", uuid).Error
 	if err != nil {
 		return reqUser, err
 	}
@@ -297,4 +297,19 @@ func (userService *UserService) RegisterStudent(u system.SysUser, eduEnrollment 
 	tx.Commit()
 
 	return u, err
+}
+
+/**
+ * @Description: 通过用户ID获取信息
+ * @param {int} userId
+ * @return {*}
+ */
+func (userService *UserService) GetUserInfoById(userId string) (user system.SysUser, err error) {
+	var reqUser system.SysUser
+	err = global.GVA_DB.Preload("EduEnrollments.EduCourse").Preload("EduOrganization").Preload("Authorities").Preload("Authority").First(&reqUser, "ID = ?", userId).Error
+	if err != nil {
+		return reqUser, err
+	}
+	MenuServiceApp.UserAuthorityDefaultRouter(&reqUser)
+	return reqUser, err
 }

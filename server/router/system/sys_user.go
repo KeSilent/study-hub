@@ -32,5 +32,6 @@ func (s *UserRouter) InitUserRouter(Router *gin.RouterGroup) {
 		userRouterWithoutRecord.GET("getUserInfo", baseApi.GetUserInfo)                                  // 获取自身信息
 		userRouterWithoutRecord.POST("getUserListByRoleIdAndOrgId", baseApi.GetUserListByRoleIdAndOrgId) // 根据角色id和组织id获取用户列表
 		userRouterWithoutRecord.POST("student_register", baseApi.RegisterStudent)                        //注册学生账号
+		userRouterWithoutRecord.GET("getUserInfoById", baseApi.GetUserInfoById)                          // 通过用户ID获取信息
 	}
 }
