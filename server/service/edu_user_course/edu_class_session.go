@@ -10,6 +10,8 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course"
 	edu_user_courseReq "github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course/request"
+
+	studentWithRemainingSessionsRes "github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course/response"
 )
 
 type EduClassSessionService struct {
@@ -86,4 +88,22 @@ func (eduClassSessionService *EduClassSessionService) GetStudentClassSessions(st
 	}
 
 	return classSessions, nil
+}
+
+// GetStudentsWithLessThanFiveSessions 获取剩余课时少于5节的学生列表
+func (eduClassSessionService *EduClassSessionService) GetStudentsWithLessThanFiveSessions() ([]studentWithRemainingSessionsRes.StudentWithRemainingSessions, error) {
+	var students []studentWithRemainingSessionsRes.StudentWithRemainingSessions
+
+	// 查询剩余课时少于5节的学生列表
+	result := global.GVA_DB.Table("sys_users").
+		Select("sys_users.*, edu_enrollment.remaining_sessions").
+		Joins("JOIN edu_enrollment on edu_enrollment.user_id = sys_users.id").
+		Where("edu_enrollment.remaining_sessions < ?", 5).
+		Scan(&students)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return students, nil
 }

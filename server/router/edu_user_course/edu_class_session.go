@@ -26,8 +26,9 @@ func (s *EduClassSessionRouter) InitEduClassSessionRouter(Router *gin.RouterGrou
 		eduClassSessionRouter.PUT("updateEduClassSession", eduClassSessionApi.UpdateEduClassSession)              // 更新EduClassSession
 	}
 	{
-		eduClassSessionRouterWithoutRecord.GET("findEduClassSession", eduClassSessionApi.FindEduClassSession)                   // 根据ID获取EduClassSession
-		eduClassSessionRouterWithoutRecord.GET("getEduClassSessionList", eduClassSessionApi.GetEduClassSessionList)             // 获取EduClassSession列表
-		eduClassSessionRouterWithoutRecord.GET("getEduClassSessionListByUser", eduClassSessionApi.GetEduClassSessionListByUser) // 获取用户的消费列表
+		eduClassSessionRouterWithoutRecord.GET("findEduClassSession", eduClassSessionApi.FindEduClassSession)                                 // 根据ID获取EduClassSession
+		eduClassSessionRouterWithoutRecord.GET("getEduClassSessionList", eduClassSessionApi.GetEduClassSessionList)                           // 获取EduClassSession列表
+		eduClassSessionRouterWithoutRecord.GET("getEduClassSessionListByUser", eduClassSessionApi.GetEduClassSessionListByUser)               // 获取用户的消费列表
+		eduClassSessionRouterWithoutRecord.GET("getStudentsWithLessThanFiveSessions", eduClassSessionApi.GetStudentsWithLessThanFiveSessions) // 获取剩余课时少于5节的学生列表
 	}
 }

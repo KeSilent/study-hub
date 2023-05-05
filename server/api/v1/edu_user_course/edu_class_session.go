@@ -192,3 +192,20 @@ func (eduClassSessionApi *EduClassSessionApi) GetEduClassSessionListByUser(c *gi
 		List: classSessions,
 	}, "获取成功", c)
 }
+
+/**
+ * @Description: 获取剩余课时少于5节的学生列表
+ * @param {*gin.Context} c
+ * @return {*}
+ */
+func (eduClassSessionApi *EduClassSessionApi) GetStudentsWithLessThanFiveSessions(c *gin.Context) {
+	students, err := eduClassSessionService.GetStudentsWithLessThanFiveSessions()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "获取学生课时记录失败"})
+		return
+	}
+
+	response.OkWithDetailed(response.PageResult{
+		List: students,
+	}, "获取成功", c)
+}
