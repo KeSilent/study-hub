@@ -1,21 +1,23 @@
 package edu_user_course
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-    edu_user_courseReq "github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course/request"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-    "github.com/flipped-aurora/gin-vue-admin/server/service"
-    "github.com/gin-gonic/gin"
-    "go.uber.org/zap"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course"
+	edu_user_courseReq "github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/service"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type EduClassSessionApi struct {
 }
 
 var eduClassSessionService = service.ServiceGroupApp.Edu_user_courseServiceGroup.EduClassSessionService
-
 
 // CreateEduClassSession 创建EduClassSession
 // @Tags EduClassSession
@@ -34,7 +36,7 @@ func (eduClassSessionApi *EduClassSessionApi) CreateEduClassSession(c *gin.Conte
 		return
 	}
 	if err := eduClassSessionService.CreateEduClassSession(&eduClassSession); err != nil {
-        global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -58,7 +60,7 @@ func (eduClassSessionApi *EduClassSessionApi) DeleteEduClassSession(c *gin.Conte
 		return
 	}
 	if err := eduClassSessionService.DeleteEduClassSession(eduClassSession); err != nil {
-        global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -76,13 +78,13 @@ func (eduClassSessionApi *EduClassSessionApi) DeleteEduClassSession(c *gin.Conte
 // @Router /eduClassSession/deleteEduClassSessionByIds [delete]
 func (eduClassSessionApi *EduClassSessionApi) DeleteEduClassSessionByIds(c *gin.Context) {
 	var IDS request.IdsReq
-    err := c.ShouldBindJSON(&IDS)
+	err := c.ShouldBindJSON(&IDS)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
 	if err := eduClassSessionService.DeleteEduClassSessionByIds(IDS); err != nil {
-        global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -106,7 +108,7 @@ func (eduClassSessionApi *EduClassSessionApi) UpdateEduClassSession(c *gin.Conte
 		return
 	}
 	if err := eduClassSessionService.UpdateEduClassSession(eduClassSession); err != nil {
-        global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -130,7 +132,7 @@ func (eduClassSessionApi *EduClassSessionApi) FindEduClassSession(c *gin.Context
 		return
 	}
 	if reeduClassSession, err := eduClassSessionService.GetEduClassSession(eduClassSession.ID); err != nil {
-        global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"reeduClassSession": reeduClassSession}, c)
@@ -154,14 +156,39 @@ func (eduClassSessionApi *EduClassSessionApi) GetEduClassSessionList(c *gin.Cont
 		return
 	}
 	if list, total, err := eduClassSessionService.GetEduClassSessionInfoList(pageInfo); err != nil {
-	    global.GVA_LOG.Error("获取失败!", zap.Error(err))
-        response.FailWithMessage("获取失败", c)
-    } else {
-        response.OkWithDetailed(response.PageResult{
-            List:     list,
-            Total:    total,
-            Page:     pageInfo.Page,
-            PageSize: pageInfo.PageSize,
-        }, "获取成功", c)
-    }
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
+}
+
+/**
+ * @Description: 获取用户的消费列表
+ * @param {*gin.Context} c
+ * @return {*}
+ */
+func (eduClassSessionApi *EduClassSessionApi) GetEduClassSessionListByUser(c *gin.Context) {
+
+	studentIdStr := c.Query("studentId")
+	studentId, err := strconv.Atoi(studentIdStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "学生ID无效"})
+		return
+	}
+
+	classSessions, err := eduClassSessionService.GetStudentClassSessions(studentId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "获取学生课时记录失败"})
+		return
+	}
+
+	response.OkWithDetailed(response.PageResult{
+		List: classSessions,
+	}, "获取成功", c)
 }

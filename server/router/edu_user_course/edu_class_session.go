@@ -1,7 +1,12 @@
+/*
+ * @Author: Yang
+ * @Date: 2023-04-10 18:33:08
+ * @Description: 学生交易记录
+ */
 package edu_user_course
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/api/v1"
+	v1 "github.com/flipped-aurora/gin-vue-admin/server/api/v1"
 	"github.com/flipped-aurora/gin-vue-admin/server/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -15,13 +20,14 @@ func (s *EduClassSessionRouter) InitEduClassSessionRouter(Router *gin.RouterGrou
 	eduClassSessionRouterWithoutRecord := Router.Group("eduClassSession")
 	var eduClassSessionApi = v1.ApiGroupApp.Edu_user_courseApiGroup.EduClassSessionApi
 	{
-		eduClassSessionRouter.POST("createEduClassSession", eduClassSessionApi.CreateEduClassSession)   // 新建EduClassSession
-		eduClassSessionRouter.DELETE("deleteEduClassSession", eduClassSessionApi.DeleteEduClassSession) // 删除EduClassSession
+		eduClassSessionRouter.POST("createEduClassSession", eduClassSessionApi.CreateEduClassSession)             // 新建EduClassSession
+		eduClassSessionRouter.DELETE("deleteEduClassSession", eduClassSessionApi.DeleteEduClassSession)           // 删除EduClassSession
 		eduClassSessionRouter.DELETE("deleteEduClassSessionByIds", eduClassSessionApi.DeleteEduClassSessionByIds) // 批量删除EduClassSession
-		eduClassSessionRouter.PUT("updateEduClassSession", eduClassSessionApi.UpdateEduClassSession)    // 更新EduClassSession
+		eduClassSessionRouter.PUT("updateEduClassSession", eduClassSessionApi.UpdateEduClassSession)              // 更新EduClassSession
 	}
 	{
-		eduClassSessionRouterWithoutRecord.GET("findEduClassSession", eduClassSessionApi.FindEduClassSession)        // 根据ID获取EduClassSession
-		eduClassSessionRouterWithoutRecord.GET("getEduClassSessionList", eduClassSessionApi.GetEduClassSessionList)  // 获取EduClassSession列表
+		eduClassSessionRouterWithoutRecord.GET("findEduClassSession", eduClassSessionApi.FindEduClassSession)                   // 根据ID获取EduClassSession
+		eduClassSessionRouterWithoutRecord.GET("getEduClassSessionList", eduClassSessionApi.GetEduClassSessionList)             // 获取EduClassSession列表
+		eduClassSessionRouterWithoutRecord.GET("getEduClassSessionListByUser", eduClassSessionApi.GetEduClassSessionListByUser) // 获取用户的消费列表
 	}
 }

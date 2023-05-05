@@ -89,7 +89,7 @@ func (eduEnrollmentService *EduEnrollmentService) ConsumeSession(userID, courseI
 	db := global.GVA_DB
 
 	// 查询用户在指定课程中的报名信息
-	result := db.Where("user_id = ? AND course_id = ?", userID, courseID).First(&enrollment)
+	result := db.Where("user_id = ? AND course_id = ?", userID, courseID).Preload("EduCourse").First(&enrollment)
 
 	// 如果找不到报名信息或发生错误，则返回错误
 	if result.Error != nil {
@@ -119,6 +119,7 @@ func (eduEnrollmentService *EduEnrollmentService) ConsumeSession(userID, courseI
 		Action:       "subtract",
 		Reason:       reason,
 		NumSessions:  &sessionsToConsume,
+		CourseName:   enrollment.EduCourse.CourseName,
 	}
 
 	err := eduClassSessionService.CreateEduClassSession(&classSession)
@@ -136,14 +137,17 @@ func (eduEnrollmentService *EduEnrollmentService) AddSession(userID, courseID, s
 	db := global.GVA_DB
 
 	// 查询用户在指定课程中的报名信息
-	result := db.Where("user_id = ? AND course_id = ?", userID, courseID).First(&enrollment)
+	result := db.Where("user_id = ? AND course_id = ?", userID, courseID).Preload("EduCourse").First(&enrollment)
 
 	// 如果找不到报名信息或发生错误，则返回错误
 	if result.Error != nil {
 		return errors.New("报名信息未找到或查询错误")
 	}
 
-	// 增加课时
+	// 增加总课时
+	*enrollment.TotalSessions += sessionsToAdd
+
+	// 增加剩余课时
 	if enrollment.RemainingSessions == nil {
 		enrollment.RemainingSessions = new(int)
 	}
@@ -156,13 +160,14 @@ func (eduEnrollmentService *EduEnrollmentService) AddSession(userID, courseID, s
 		return errors.New("更新报名信息失败")
 	}
 
-	enenrollmentId := int(enrollment.ID)
+	enrollmentId := int(enrollment.ID)
 	// 记录课时操作
 	classSession := edu_user_course.EduClassSession{
-		EnrollmentId: &enenrollmentId,
+		EnrollmentId: &enrollmentId,
 		Action:       "add",
 		Reason:       reason,
 		NumSessions:  &sessionsToAdd,
+		CourseName:   enrollment.EduCourse.CourseName,
 	}
 
 	result = db.Create(&classSession)
@@ -172,4 +177,10 @@ func (eduEnrollmentService *EduEnrollmentService) AddSession(userID, courseID, s
 	}
 
 	return nil
+}
+
+// GetEduEnrollmentByUser 根据用户ID和课程ID获取报名信息
+func (eduEnrollmentService *EduEnrollmentService) GetEduEnrollmentByUser(userId uint, courseId uint) (eduEnrollment edu_user_course.EduEnrollment, err error) {
+	err = global.GVA_DB.Where("user_id = ? and course_id=?", userId, courseId).First(&eduEnrollment).Error
+	return
 }
