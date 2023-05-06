@@ -1,24 +1,22 @@
-FROM golang:alpine as builder
+# 第一阶段：编译二进制文件
+FROM golang:alpine AS builder
 
 WORKDIR /go/src/github.com/flipped-aurora/gin-vue-admin/server
+COPY go.mod go.sum ./
+RUN go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct \
+    && go mod download
 COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server .
 
-RUN go env -w GO111MODULE=on \
-    && go env -w GOPROXY=https://goproxy.cn,direct \
-    && go env -w CGO_ENABLED=0 \
-    && go env \
-    && go mod tidy \
-    && go build -o server .
-
+# 第二阶段：构建应用镜像
 FROM alpine:latest
 
-LABEL MAINTAINER="SliverHorn@sliver_horn@qq.com"
+LABEL MAINTAINER="Jack@kesilent@live.com"
 
-WORKDIR /go/src/github.com/flipped-aurora/gin-vue-admin/server
-
-COPY --from=0 /go/src/github.com/flipped-aurora/gin-vue-admin/server/server ./
-COPY --from=0 /go/src/github.com/flipped-aurora/gin-vue-admin/server/resource ./resource/
-COPY --from=0 /go/src/github.com/flipped-aurora/gin-vue-admin/server/config.docker.yaml ./
+WORKDIR /app
+COPY --from=builder /go/src/github.com/flipped-aurora/gin-vue-admin/server/server .
+COPY --from=builder /go/src/github.com/flipped-aurora/gin-vue-admin/server/resource ./resource/
+COPY --from=builder /go/src/github.com/flipped-aurora/gin-vue-admin/server/config.docker.yaml ./
 
 EXPOSE 8888
-ENTRYPOINT ./server -c config.docker.yaml
+ENTRYPOINT ["./server", "-c", "config.docker.yaml"]
