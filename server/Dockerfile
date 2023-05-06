@@ -13,6 +13,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server .
 FROM alpine:latest
 
 LABEL MAINTAINER="Jack@kesilent@live.com"
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 WORKDIR /app
 COPY --from=builder /go/src/github.com/flipped-aurora/gin-vue-admin/server/server .
