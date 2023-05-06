@@ -1,9 +1,10 @@
 # 第一阶段：编译二进制文件
 FROM golang:alpine AS builder
 
+RUN apk add --no-cache git gcc g++ libc-dev
+
 WORKDIR /go/src/github.com/flipped-aurora/gin-vue-admin/server
 COPY go.mod go.sum ./
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 RUN go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct \
     && go mod download
 COPY . .
@@ -13,7 +14,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server .
 FROM alpine:latest
 
 LABEL MAINTAINER="Jack@kesilent@live.com"
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 WORKDIR /app
 COPY --from=builder /go/src/github.com/flipped-aurora/gin-vue-admin/server/server .
