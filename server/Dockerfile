@@ -3,6 +3,7 @@ FROM golang:alpine AS builder
 
 WORKDIR /go/src/github.com/flipped-aurora/gin-vue-admin/server
 COPY go.mod go.sum ./
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 RUN go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct \
     && go mod download
 COPY . .
