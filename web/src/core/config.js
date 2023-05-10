@@ -1,3 +1,8 @@
+/*
+ * @Author: Yang
+ * @Date: 2023-04-10 18:22:12
+ * @Description: 请填写简介
+ */
 /**
  * 网站配置文件
  */
@@ -24,6 +29,11 @@ export const viteLogo = (env) => {
     console.log(
       chalk.green(
         `> 加群方式:微信：shouzi_1994 QQ群：622360840`
+      )
+    )
+    console.log(
+      chalk.green(
+        `> 接口地址:${env.VITE_BASE_PATH}`
       )
     )
     console.log(
