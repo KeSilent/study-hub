@@ -21,7 +21,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # 镜像编写者及邮箱
-LABEL MAINTAINER="SliverHorn@sliver_horn@qq.com"
+LABEL MAINTAINER="Jack@kesilent@live.com"
 
 # 从.docker-compose/nginx/conf.d/目录拷贝my.conf到容器内的/etc/nginx/conf.d/my.conf
 COPY .docker-compose/nginx/conf.d/my.conf /etc/nginx/conf.d/my.conf
