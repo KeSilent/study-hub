@@ -5,7 +5,7 @@ import { emitter } from '@/utils/bus.js'
 import router from '@/router/index'
 
 const service = axios.create({
-  baseURL: import.meta.env.VITE_BASE_PATH + import.meta.env.VITE_BASE_API,
+  baseURL: import.meta.env.VITE_BASE_API,
   timeout: 99999
 })
 let acitveAxios = 0
@@ -61,7 +61,6 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   response => {
     const userStore = useUserStore()
-    console.log("interceptors:", response);
     if (!response.config.donNotShowLoading) {
       closeLoading()
     }
