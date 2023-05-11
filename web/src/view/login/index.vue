@@ -69,6 +69,14 @@
         </el-form>
       </div>
       <div class="login_panel_right" />
+      <div class="login_panel_foot">
+        <div class="links">
+          {{ basePath }}
+        </div>
+        <div class="copyright">
+          <BottomInfo />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -88,6 +96,7 @@ import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/pinia/modules/user'
 const router = useRouter()
+const basePath = ref(import.meta.env.VITE_BASE_PATH)
 // 验证函数
 const checkUsername = (rule, value, callback) => {
   if (value.length < 5) {
