@@ -50,6 +50,7 @@ func (userService *UserService) WXLogin(u systemReq.WXLoginReq) (userInter *syst
 		registerUser.Username = gofakeit.Username()
 		registerUser.WXOpenid = wxKey.OpenId
 		registerUser.WXSessionKey = wxKey.SessionKey
+		userService.Register(registerUser)
 	} else {
 		global.GVA_DB.Model(&userInter).Where("wx_openid = ?", wxKey.OpenId).Updates(system.SysUser{WXSessionKey: wxKey.SessionKey})
 	}
