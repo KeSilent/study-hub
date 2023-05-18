@@ -36,8 +36,8 @@ var (
 	BlackCache local_cache.Cache
 	lock       sync.RWMutex
 
-	WXAppId  string = "wxe4bfe66b935c32c4"               //微信的appId
-	WXSecret string = "14b4858937710fa9c022c9fe3c4ce87d" //微信的Secret
+	WXAppId  string = "wx5d13bc2f21793d9c"               //微信的appId
+	WXSecret string = "9863b0be711f97b5b9aa7d19e22539dc" //微信的Secret
 )
 
 // GetGlobalDBByDBName 通过名称获取db list中的db
