@@ -1,8 +1,6 @@
 # 第一阶段：编译二进制文件
 FROM golang:alpine AS builder
 
-RUN apk add --no-cache git gcc g++ libc-dev
-
 WORKDIR /go/src/github.com/flipped-aurora/gin-vue-admin/server
 COPY go.mod go.sum ./
 RUN go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct \
