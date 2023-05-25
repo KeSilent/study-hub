@@ -4,6 +4,7 @@
     <div class="gva-table-box">
       <div class="gva-btn-list">
         <el-button type="primary" icon="plus" @click="addUser">新增用户</el-button>
+        <el-button type="primary" icon="plus" @click="importUser">导入用户</el-button>
       </div>
       <el-table :data="tableData" row-key="ID">
         <el-table-column align="left" label="头像" min-width="75">
@@ -115,6 +116,41 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="importUserDialog" custom-class="user-dialog" title="用户" :show-close="false"
+      :close-on-press-escape="false" :close-on-click-modal="false">
+      <div style="height:30vh;overflow:auto;padding:0 12px;">
+        <el-form ref="importUserForm" :rules="rules" :model="importUserInfo" label-width="80px">
+          <el-form-item label="用户角色" prop="authorityId">
+            <el-cascader v-model="importUserInfo.authorityIds" style="width:100%" :options="authOptions"
+              :show-all-levels="false"
+              :props="{ multiple: true, checkStrictly: true, label: 'authorityName', value: 'authorityId', disabled: 'disabled', emitPath: false }"
+              :clearable="false" />
+          </el-form-item>
+          <el-form-item label="所属组织" prop="eduOrganizationID">
+            <el-select v-model="importUserInfo.eduOrganizationID" style="width:100%">
+              <el-option v-for="item in organizationOptions" :key="item.ID" :label="item.name" :value="item.ID" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="导入文件" prop="importFile">
+            <el-upload class="upload-demo" drag :action="`${path}/fileUploadAndDownload/upload`"
+              :headers="{ 'x-token': userStore.token }" :on-success="handleImageSuccess"
+              :before-upload="beforeImageUpload" multiple:false>
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+              <div class="el-upload__tip" slot="tip">只能上传xlsx文件，且不超过500kb</div>
+            </el-upload>
+          </el-form-item>
+        </el-form>
+      </div>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="closeImportUser">取 消</el-button>
+          <el-button type="primary" @click="enterImportUserDialog">确 定</el-button>
+        </div>
+      </template>
+    </el-dialog>
     <ChooseImg ref="chooseImg" :target="userInfo" :target-key="`headerImg`" />
   </div>
 </template>
@@ -131,7 +167,8 @@ import {
   getUserList,
   setUserAuthorities,
   register,
-  deleteUser
+  deleteUser,
+  importExcelUser
 } from '@/api/user'
 
 import { getAuthorityList } from '@/api/authority'
@@ -140,10 +177,14 @@ import CustomPic from '@/components/customPic/index.vue'
 import ChooseImg from '@/components/chooseImg/index.vue'
 import WarningBar from '@/components/warningBar/warningBar.vue'
 import { setUserInfo, resetPassword } from '@/api/user.js'
+import { useUserStore } from '@/pinia/modules/user'
 
 import { nextTick, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 const path = ref(import.meta.env.VITE_BASE_API + '/')
+
+const userStore = useUserStore()
+
 // 初始化相关
 const setAuthorityOptions = (AuthorityData, optionsData) => {
   AuthorityData &&
@@ -165,6 +206,22 @@ const setAuthorityOptions = (AuthorityData, optionsData) => {
       }
     })
 }
+
+const handleImageSuccess = (res) => {
+  const { data } = res
+  if (data.file) {
+    importUserInfo.value.importFile = data.file.url
+  }
+}
+
+const beforeImageUpload = (file) => {
+  const isXlsx = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  if (!isXlsx) {
+    ElMessage.error('只能是 xlsx 格式!')
+    return false
+  }
+}
+
 
 const page = ref(1)
 const total = ref(0)
@@ -278,6 +335,13 @@ const userInfo = ref({
   enable: 1,
 })
 
+const importUserInfo = ref({
+  authorityId: '',
+  authorityIds: [],
+  eduOrganizationID: '',
+  importFile: '',
+})
+
 const rules = ref({
   userName: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -299,8 +363,11 @@ const rules = ref({
   authorityId: [
     { required: true, message: '请选择用户角色', trigger: 'blur' }
   ],
-  eduOrganizationID:[
+  eduOrganizationID: [
     { required: true, message: '请选择用户组织', trigger: 'blur' }
+  ],
+  importFile: [
+    { required: true, message: '请选择文件', trigger: 'blur' }
   ]
 })
 const userForm = ref(null)
@@ -344,6 +411,33 @@ const dialogFlag = ref('add')
 const addUser = () => {
   dialogFlag.value = 'add'
   addUserDialog.value = true
+}
+
+const importUserDialog = ref(false)
+const importUser = () => {
+  dialogFlag.value = 'import'
+  importUserDialog.value = true
+}
+const closeImportUser = () => {
+  importUserDialog.value = false
+}
+//导入用户
+const importUserForm = ref(null)
+const enterImportUserDialog = () => {
+  importUserInfo.value.authorityId = importUserInfo.value.authorityIds[0]
+  importUserForm.value.validate(async valid => {
+    if (valid) {
+      const req = {
+        ...importUserInfo.value
+      }
+      const res = await importExcelUser(req)
+      if (res.code === 0) {
+        ElMessage({ type: 'success', message: '创建成功' })
+        await getTableData()
+        closeImportUser()
+      }
+    }
+  })
 }
 
 const tempAuth = {}

@@ -70,3 +70,19 @@ func (eduCourseService *EduCourseService) GetEduCourseInfoList(info edu_organiza
 	err = db.Preload("EduOrganization").Limit(limit).Offset(offset).Find(&eduCourses).Error
 	return eduCourses, total, err
 }
+
+/**
+ * @Description: 通过组织ID获取当前组织下的课程
+ * @param {uint} oId
+ * @return {*}
+ */
+func (eduCourseService *EduCourseService) GetEduCourseInfoListByOrganId(oId uint) (list []edu_organization.EduCourse, err error) {
+
+	db := global.GVA_DB.Model(&edu_organization.EduCourse{})
+	var eduCourses []edu_organization.EduCourse
+	db = db.Where("organization_id = ?", oId)
+
+	err = db.Preload("EduOrganization").Find(&eduCourses).Error
+
+	return eduCourses, err
+}

@@ -14,10 +14,13 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system/response"
 	"github.com/flipped-aurora/gin-vue-admin/server/plugin/wx"
+	"github.com/flipped-aurora/gin-vue-admin/server/service/edu_organization"
+	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"gorm.io/gorm"
 )
 
@@ -105,4 +108,37 @@ func GetWXSession(code string) (*response.WXLoginResp, error) {
 	}
 
 	return &wxResp, nil
+}
+
+/**
+ * @Description: 导入并注册用户
+ * @param {systemReq.ImportUserInfoReq} u
+ * @return {*}
+ */
+func (userService *UserService) ImportRegister(u systemReq.ImportUserInfoReq) (err error) {
+	service := &edu_organization.EduCourseService{}
+	courseList, err := service.GetEduCourseInfoListByOrganId(u.EduOrganizationID)
+
+	rs := utils.EnalysisExcel(u.ImportFile, courseList)
+
+	for _, r := range rs {
+
+		var authorities []system.SysAuthority
+		for _, v := range u.AuthorityIds {
+			authorities = append(authorities, system.SysAuthority{
+				AuthorityId: v,
+			})
+		}
+
+		user := &system.SysUser{Username: r.Username, NickName: r.NickName, Password: r.Password, HeaderImg: r.HeaderImg, AuthorityId: r.AuthorityId, Authorities: authorities, Enable: r.Enable, Phone: r.Phone, Email: r.Email, EduOrganizationID: u.EduOrganizationID}
+
+		eduEnrollment := edu_user_course.EduEnrollment{}
+		eduEnrollment.CourseId = &r.Course
+		eduEnrollment.TotalSessions = &r.TotalSessions
+		eduEnrollment.RemainingSessions = &r.RemainingSessions
+
+		userService.RegisterStudent(*user, &eduEnrollment)
+	}
+
+	return err
 }

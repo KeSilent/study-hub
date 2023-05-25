@@ -107,12 +107,12 @@ mssql:
   log-mode: ""
   log-zap: false
 mysql:
-  path: 120.92.117.87
+  path: 127.0.0.1
   port: "3306"
   config: charset=utf8mb4&parseTime=True&loc=Local
   db-name: study-hub
   username: root
-  password: mlb%3375238Xtra
+  password: root
   prefix: ""
   singular: false
   engine: ""

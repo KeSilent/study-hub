@@ -164,3 +164,16 @@ export const resetPassword = (data) => {
     data: data
   })
 }
+
+/**
+ * 导入用户
+ * @param {*} data 
+ * @returns 
+ */
+export const importExcelUser = (data) => {
+  return service({
+    url: '/user/importExcelUser',
+    method: 'post',
+    data: data
+  })
+}

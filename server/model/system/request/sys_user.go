@@ -72,3 +72,14 @@ type ChangeUserInfo struct {
 type WXLoginReq struct {
 	Code string `json:"code"`
 }
+
+/**
+ * @description: 导入用户
+ * @return {*}
+ */
+type ImportUserInfoReq struct {
+	AuthorityId       uint   `json:"authorityId"`
+	AuthorityIds      []uint `json:"authorityIds" swaggertype:"string" example:"[]uint 角色id"`
+	EduOrganizationID uint   `json:"eduOrganizationID"`
+	ImportFile        string `json:"importFile"`
+}

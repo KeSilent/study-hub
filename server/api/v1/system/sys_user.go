@@ -562,3 +562,20 @@ func (b *BaseApi) GetUserInfoById(c *gin.Context) {
 	}
 	response.OkWithDetailed(gin.H{"userInfo": ReqUser}, "获取成功", c)
 }
+
+/**
+ * @Description: 导入用户
+ * @param {*gin.Context} c
+ * @return {*}
+ */
+func (b *BaseApi) ImportXlsxUser(c *gin.Context) {
+	var l systemReq.ImportUserInfoReq
+	err := c.ShouldBindJSON(&l)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	userExtendService.ImportRegister(l)
+
+	response.OkWithMessage("导入成功", c)
+}
