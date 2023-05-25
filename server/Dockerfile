@@ -6,9 +6,7 @@ COPY go.mod go.sum ./
 RUN go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct \
     && go mod download
 COPY . .
-# RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server .
-
-RUN go build -a -o server .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server .
 
 # 第二阶段：构建应用镜像
 FROM alpine:latest
