@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
@@ -47,13 +46,7 @@ func (userService *UserService) WXLogin(u systemReq.WXLoginReq) (userInter *syst
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		//没有注册
-		var registerUser system.SysUser
-		registerUser.NickName = gofakeit.Username()
-		registerUser.Password = "11234567890"
-		registerUser.Username = gofakeit.Username()
-		registerUser.WXOpenid = wxKey.OpenId
-		registerUser.WXSessionKey = wxKey.SessionKey
-		userService.Register(registerUser)
+		return userInter, errors.New("没有注册")
 	} else {
 		global.GVA_DB.Model(&userInter).Where("wx_openid = ?", wxKey.OpenId).Updates(system.SysUser{WXSessionKey: wxKey.SessionKey})
 	}
@@ -141,4 +134,35 @@ func (userService *UserService) ImportRegister(u systemReq.ImportUserInfoReq) (e
 	}
 
 	return err
+}
+
+/**
+ * @description: 手机号码绑定微信登陆
+ * @param {system.SysUser} u
+ * @return {*}
+ */
+func (userService *UserService) WXLoginForPhone(login systemReq.WXLoginReq) (userInter *system.SysUser, err error) {
+	if nil == global.GVA_DB {
+		return nil, fmt.Errorf("db not init")
+	}
+	err = global.GVA_DB.Preload("EduOrganization").Where("phone = ?", login.Phone).Preload("Authorities").Preload("Authority").First(&userInter).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		//没有注册
+		return userInter, errors.New("没有注册")
+	} else {
+		//如果通过手机号查询到用户后，则绑定微信信息
+
+		wxKey, err := wx.GetWXSession(login.Code)
+		if err != nil {
+			return userInter, err
+		}
+		global.GVA_DB.Model(&userInter).Where("phone = ?", login.Phone).Updates(system.SysUser{WXSessionKey: wxKey.SessionKey, WXOpenid: wxKey.OpenId})
+
+		userInter, err = SelectUser(wxKey.OpenId, wxKey.SessionKey)
+
+		MenuServiceApp.UserAuthorityDefaultRouter(userInter)
+	}
+
+	return userInter, err
 }

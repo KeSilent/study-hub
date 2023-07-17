@@ -70,7 +70,8 @@ type ChangeUserInfo struct {
  * @return {*}
  */
 type WXLoginReq struct {
-	Code string `json:"code"`
+	Code  string `json:"code"`
+	Phone string `json:"phone"`
 }
 
 /**

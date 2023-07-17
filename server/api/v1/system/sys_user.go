@@ -475,8 +475,11 @@ func (b *BaseApi) WXLogin(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	user, _ := userExtendService.WXLogin(l)
-
+	user, err := userExtendService.WXLogin(l)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
 	b.TokenNext(c, *user)
 }
 
@@ -578,4 +581,24 @@ func (b *BaseApi) ImportXlsxUser(c *gin.Context) {
 	userExtendService.ImportRegister(l)
 
 	response.OkWithMessage("导入成功", c)
+}
+
+/**
+ * @description: 微信登陆绑定手机号
+ * @param {*gin.Context} c
+ * @return {*}
+ */
+func (b *BaseApi) WXLoginForPhone(c *gin.Context) {
+	var l systemReq.WXLoginReq
+	err := c.ShouldBindJSON(&l)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	user, err := userExtendService.WXLoginForPhone(l)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	b.TokenNext(c, *user)
 }
