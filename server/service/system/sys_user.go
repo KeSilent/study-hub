@@ -106,6 +106,10 @@ func (userService *UserService) GetUserListByRoleIdAndOrgId(info request.PageInf
 		db = db.Where("nick_name LIKE ?", "%"+info.UserName+"%")
 	}
 
+	if info.Phone != "" {
+		db = db.Where("phone = ?", info.Phone)
+	}
+
 	if info.RoleId > 0 {
 		db = db.Joins("left join sys_user_authority on sys_user_authority.sys_user_id = sys_users.id").
 			Where("sys_user_authority.sys_authority_authority_id = ?", info.RoleId)

@@ -19,6 +19,7 @@ type PageInfoByRoleIdAndOrgId struct {
 	RoleId   int    `json:"roleId" form:"roleId"`
 	OrgId    int    `json:"orgId" form:"orgId"`
 	UserName string `json:"userName" form:"userName"`
+	Phone    string `json:"phone" form:"phone"`
 }
 
 // GetById Find by id structure
