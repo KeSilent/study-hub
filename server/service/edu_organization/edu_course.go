@@ -62,6 +62,9 @@ func (eduCourseService *EduCourseService) GetEduCourseInfoList(info edu_organiza
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {
 		db = db.Where("created_at BETWEEN ? AND ?", info.StartCreatedAt, info.EndCreatedAt)
 	}
+	if info.OrganizationId != nil {
+		db = db.Where("organization_id = ? ", info.OrganizationId)
+	}
 	err = db.Count(&total).Error
 	if err != nil {
 		return
