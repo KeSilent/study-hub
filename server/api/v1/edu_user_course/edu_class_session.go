@@ -10,6 +10,7 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course"
 	edu_user_courseReq "github.com/flipped-aurora/gin-vue-admin/server/model/edu_user_course/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/service"
+	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -18,6 +19,7 @@ type EduClassSessionApi struct {
 }
 
 var eduClassSessionService = service.ServiceGroupApp.Edu_user_courseServiceGroup.EduClassSessionService
+var userService = service.ServiceGroupApp.SystemServiceGroup.UserService
 
 // CreateEduClassSession 创建EduClassSession
 // @Tags EduClassSession
@@ -199,7 +201,16 @@ func (eduClassSessionApi *EduClassSessionApi) GetEduClassSessionListByUser(c *gi
  * @return {*}
  */
 func (eduClassSessionApi *EduClassSessionApi) GetStudentsWithLessThanFiveSessions(c *gin.Context) {
-	students, err := eduClassSessionService.GetStudentsWithLessThanFiveSessions()
+	userId := utils.GetUserID(c)
+
+	ReqUser, err := userService.FindUserById(int(userId))
+	if err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+		return
+	}
+
+	students, err := eduClassSessionService.GetStudentsWithLessThanFiveSessions(ReqUser.EduOrganizationID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "获取学生课时记录失败"})
 		return

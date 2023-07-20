@@ -91,14 +91,14 @@ func (eduClassSessionService *EduClassSessionService) GetStudentClassSessions(st
 }
 
 // GetStudentsWithLessThanFiveSessions 获取剩余课时少于5节的学生列表
-func (eduClassSessionService *EduClassSessionService) GetStudentsWithLessThanFiveSessions() ([]studentWithRemainingSessionsRes.StudentWithRemainingSessions, error) {
+func (eduClassSessionService *EduClassSessionService) GetStudentsWithLessThanFiveSessions(organizationID uint) ([]studentWithRemainingSessionsRes.StudentWithRemainingSessions, error) {
 	var students []studentWithRemainingSessionsRes.StudentWithRemainingSessions
 
 	// 查询剩余课时少于5节的学生列表
 	result := global.GVA_DB.Table("sys_users").
 		Select("sys_users.*, edu_enrollment.remaining_sessions").
 		Joins("JOIN edu_enrollment on edu_enrollment.user_id = sys_users.id").
-		Where("edu_enrollment.remaining_sessions < ?", 5).
+		Where("edu_enrollment.remaining_sessions < ? and sys_users.edu_organization_id= ? ", 5, organizationID).
 		Scan(&students)
 
 	if result.Error != nil {
