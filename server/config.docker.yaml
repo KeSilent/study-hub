@@ -57,12 +57,12 @@ captcha:
 # mysql connect configuration
 # 未初始化之前请勿手动修改数据库信息！！！如果一定要手动初始化请看（https://gin-vue-admin.com/docs/first_master）
 mysql:
-  path: 120.92.117.87
-  port: "3306"
+  path: zeabur-gcp-asia-east1-1.clusters.zeabur.com
+  port: "31106"
   config: charset=utf8mb4&parseTime=True&loc=Local
   db-name: study-hub
   username: root
-  password: mlb%3375238Xtra
+  password: e8bh7VDj6054
   max-idle-conns: 10
   max-open-conns: 100
   log-mode: ""
