@@ -52,3 +52,10 @@
 | `--timer` | timer | 定时器接口封装 |
 | `--upload`      | oss                  | oss接口封装        |
 
+
+编译：
+```shell
+docker build --platform=linux/amd64 -t  study-hub-server:1.0 .
+docker tag aeb958ce0bc306cb1f1 registry.cn-zhangjiakou.aliyuncs.com/developer_jk/stdy-hub-server-loc:1.0
+docker push registry.cn-zhangjiakou.aliyuncs.com/developer_jk/stdy-hub-server-loc:1.0
+```
